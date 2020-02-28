@@ -26,16 +26,17 @@ done
 : ${DEVDIR:=/usr/local/src/build}
 PKGDIR="$DEVDIR/mesa"
 
-## UNINSTALL
-test yes != "$UNINSTALL" || (
+if test yes = "$UNINSTALL"
+then (
+    ## UNINSTALL
     echo set -ex
     echo cd "'$PKGDIR'"
 
     echo ninja -C pbp-build uninstall
     echo ldconfig
-) | sudo -s &&
+  ) | sudo -s
 
-(
+else (
     ## REQS
     echo echo
     echo echo +++ Make sure that deb-src is enabled in /etc/apt/sources.list
@@ -46,24 +47,24 @@ test yes != "$UNINSTALL" || (
     echo apt -y build-dep mesa
     echo mkdir -p      "'$DEVDIR'"
     echo chown `id -u` "'$DEVDIR'"
-) | sudo -s &&
+  ) | sudo -s &&
 
-(
+  (
     set -ex
     cd "$DEVDIR"
   
     ## GET/UPDATE
     test -f "$PKGDIR/.gitignore" ||
-        git clone --depth=1 https://gitlab.freedesktop.org/mesa/mesa.git;
+      git clone --depth=1 https://gitlab.freedesktop.org/mesa/mesa.git
 
     ## UPDATE (RERUN)
     cd "$PKGDIR"
     git clean -f
     git reset --hard
     git pull
-) &&
+  ) &&
 
-(
+  (
     set -ex
     cd "$PKGDIR"
 
@@ -79,9 +80,9 @@ test yes != "$UNINSTALL" || (
 
     ## BUILD
     ninja -C pbp-build
-) &&
+  ) &&
 
-(
+  (
     echo set -ex
     echo cd "'$PKGDIR'"
 
@@ -89,9 +90,10 @@ test yes != "$UNINSTALL" || (
     echo ninja -C pbp-build install
     echo ldconfig
     echo rm -Rf pbp-build
-) | sudo -s &&
+  ) | sudo -s &&
 
-# RESTART XORG OR WAYLAND
-echo "+++ Done - restart Xorg or Wayland now :)"
+  # RESTART XORG OR WAYLAND
+  echo "+++ Done - restart Xorg or Wayland now :)"
+fi
 
 # ENJOY
