@@ -17,7 +17,8 @@ for args do
 	   val=`expr "$args" : '[^=]*=\(.*\)'`
 	   eval "$var"="'$val'" ;;
     *)     exec >&2
-	   echo "Usage: /bin/sh `basename $0` [DEVDIR=/fancy/build/folder] [UNINSTALL=yes]"
+	   s="[DEVDIR=/fancy/build/folder] [UNINSTALL=yes] [GIT_PULL=no] [CLEAN=no]"
+	   echo "Usage: /bin/sh `basename $0` $s"
 	   exit 2
     esac
 done
@@ -60,8 +61,11 @@ else (
     ## UPDATE (RERUN)
     cd "$PKGDIR"
     git clean -f
-    git reset --hard
-    git pull
+    test no = "$GIT_PULL" || {
+      git checkout master
+      git reset --hard
+      git pull origin master
+    }
   ) &&
 
   (
@@ -89,7 +93,9 @@ else (
     ## INSTALL & CLEAN
     echo ninja -C pbp-build install
     echo ldconfig
-    echo rm -Rf pbp-build
+    test no = "$CLEAN" || {
+      echo rm -Rf pbp-build
+    }
   ) | sudo -s &&
 
   # RESTART XORG OR WAYLAND
