@@ -45,7 +45,7 @@ else (
     echo set -ex
     echo apt update
     echo apt -y install meson ccache git build-essential cmake
-    echo apt -y build-dep mesa
+    echo apt -y build-dep mesa libcairo2-dev
     echo mkdir -p      "'$DEVDIR'"
     echo chown `id -u` "'$DEVDIR'"
   ) | sudo -s &&
@@ -65,6 +65,7 @@ else (
       git checkout master
       git reset --hard
       git pull origin master
+      git branch `date "+%Y%m%d%H%M%S-bullt"` || true
     }
   ) &&
 
